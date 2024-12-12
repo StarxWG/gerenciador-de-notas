@@ -38,13 +38,33 @@ const servidor = http.createServer((req, res) =>{
     }
 
     // PUT
-    else if(url.startsWith('/grades') & method === 'PUT'){
-
+    else if(url.startsWith('/grades/') & method === 'PUT'){
+        const {studantName, subject, grade} = JSON.parse(body);
+        const gradesToUpdate = grades.find((g) => g.id === id);
+    
+        if (gradesToUpdate){
+            gradesToUpdate.studantName = studantName;
+            gradesToUpdate.subject = subject;
+            gradesToUpdate.grade = grade;
+            res.writeHead(200, {'Content-Type': 'application/json'})
+            res.end(JSON.stringify(gradesToUpdate));
+        } else{
+            res.writeHead(404, {'Content-Type': 'application/json'})
+            res.end(JSON.stringify({message: 'Não encontrado'}));
+        }
     }
 
     // DELETE
-    else if (url.startsWith('/grades') & method === "DELETE"){
-
+    else if (url.startsWith('/grades/') & method === "DELETE"){
+        const index = grades.findIndex((g) => g.id === id)
+        if (index !== -1){
+            grades.splice(index, 1);
+            res.writeHead(204)
+            res.end()
+        } else {
+            res.writeHead(404, {'Content-Type': 'application/json'})
+            req.end(JSON.stringify({message: 'grade not found'}))
+        }
     }
 
     // Erro
